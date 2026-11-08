@@ -5,6 +5,8 @@
 //   node render.mjs hello                        -> same, name lookup in videos/
 //   node render.mjs hello --stills 3             -> out/stills/hello-1.png ... -3.png
 //   node render.mjs hello --fps 60               -> override the default 30 fps
+//   node render.mjs promo --variant vertical     -> out/promo-vertical.mp4; the page gets
+//                                                   ?variant=vertical and can change SIZE/layout
 //
 // A video sets window.DURATION (seconds), window.SIZE ([w, h]) and
 // window.render(t), which must draw the exact frame for time t.
@@ -26,10 +28,11 @@ const opt = (name, fallback) => {
 };
 const stills = opt("stills", null);
 const fps = Number(opt("fps", 30));
+const variant = opt("variant", null);
 const input = args[0];
 
 if (!input) {
-  console.error("Usage: node render.mjs <video.html | name> [--stills N] [--fps 30]");
+  console.error("Usage: node render.mjs <video.html | name> [--stills N] [--fps 30] [--variant NAME]");
   process.exit(1);
 }
 
@@ -40,7 +43,7 @@ if (!existsSync(file)) {
   process.exit(1);
 }
 file = path.resolve(file);
-const name = path.basename(file, ".html");
+const name = path.basename(file, ".html") + (variant ? `-${variant}` : "");
 const outDir = path.resolve("out");
 
 // ---- Playwright (local install if present, else the global one) ------------
@@ -62,7 +65,9 @@ try {
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 
-  await page.goto(pathToFileURL(file).href, { waitUntil: "load" });
+  const url = pathToFileURL(file);
+  if (variant) url.searchParams.set("variant", variant);
+  await page.goto(url.href, { waitUntil: "load" });
 
   // Load every @font-face up front (fonts otherwise load lazily, on first use),
   // so frame 0 already uses the right fonts. Stop if a font file is missing.

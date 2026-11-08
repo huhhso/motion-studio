@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../brand.css">
+<style>
+  .abs { position: absolute; }
+
+  /* ---- shared look ---- */
+  .tee   { left: 0; right: 0; text-align: center; font-family: var(--font-display); font-weight: 500; }
+  .title { left: 0; right: 0; text-align: center; font-family: var(--font-display); font-weight: 700;
+           letter-spacing: -0.02em; transform-origin: 50% 0; }
+  .title .hl { color: var(--accent); }
+
+  .card { background: var(--surface); border-radius: 28px; }
+  .card .ring { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 4px var(--accent); }
+  .num  { font-family: var(--font-display); font-weight: 700; color: var(--accent); line-height: 1; }
+  .head { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+  .line { font-family: var(--font-body); line-height: 1.4; }
+
+  .end  { left: 0; right: 0; display: flex; flex-direction: column; align-items: center; }
+  .cta  { font-family: var(--font-display); font-weight: 600; }
+
+  /* ---- landscape 1920x1080 (YouTube) ---- */
+  body.landscape .tee   { font-size: 48px; }
+  body.landscape .title { font-size: 72px; line-height: 1.1; }
+  body.landscape .card  { top: 330px; width: 533px; height: 520px; padding: 56px 52px; }
+  body.landscape .num   { font-size: 170px; }
+  body.landscape .head  { font-size: 44px; margin-top: 30px; min-height: 2.3em; }
+  body.landscape .line  { font-size: 28px; margin-top: 14px; }
+  body.landscape .logo  { height: 430px; }
+  body.landscape .cta   { font-size: 52px; margin-top: 48px; }
+
+  /* ---- vertical 1080x1920 (Reels / Shorts / TikTok) ---- */
+  body.vertical .tee    { font-size: 52px; }
+  body.vertical .title  { font-size: 84px; line-height: 1.1; }
+  body.vertical .card   { left: 72px; width: 936px; height: 290px; padding: 0 48px;
+                          display: grid; grid-template-columns: 150px 1fr; column-gap: 28px; align-items: center; }
+  body.vertical .num    { font-size: 160px; text-align: center; }
+  body.vertical .head   { font-size: 46px; }
+  body.vertical .line   { font-size: 30px; margin-top: 10px; }
+  body.vertical .logo   { width: 640px; }
+  body.vertical .cta    { font-size: 54px; margin-top: 56px; }
+</style>
+</head>
+<body>
+  <div class="abs tee" id="tee">Got a result you love?</div>
+  <div class="abs title" id="title"></div>
+
+  <div class="abs card" id="card1"><div class="ring"></div><div class="num">1</div><div class="txt">
+    <div class="head">Capture the moment</div>
+    <div class="line">Like turning a client answer into a post.</div></div></div>
+  <div class="abs card" id="card2"><div class="ring"></div><div class="num">2</div><div class="txt">
+    <div class="head">Say “make this a skill”</div>
+    <div class="line">It saves your steps, style and rules.</div></div></div>
+  <div class="abs card" id="card3"><div class="ring"></div><div class="num">3</div><div class="txt">
+    <div class="head">Reuse it anytime</div>
+    <div class="line">Paste the next answer. Get the next post.</div></div></div>
+
+  <div class="abs end" id="end">
+    <img class="logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
+    <div class="cta" id="cta">Follow me for more AI shortcuts</div>
+  </div>
+
+<script>
+  // ---- format: landscape by default; ?variant=vertical for 1080x1920 ----
+  const VERTICAL = new URLSearchParams(location.search).get("variant") === "vertical";
+  window.DURATION = 15;
+  window.SIZE = VERTICAL ? [1080, 1920] : [1920, 1080];
+  const [W, H] = window.SIZE;
+  document.body.className = VERTICAL ? "vertical" : "landscape";
+
+  // ---- layout numbers (px) ----
+  const L = VERTICAL
+    ? { teeH: 72, gap: 34, titleFont: 84, titleLines: 2, headerTop: 300, bigScale: 1.45,
+        cardTops: [600, 930, 1260], cardLefts: [72, 72, 72], endH: 568 + 56 + 76 }
+    : { teeH: 66, gap: 30, titleFont: 72, titleLines: 1, headerTop: 110, bigScale: 1.75,
+        cardTops: [330, 330, 330], cardLefts: [120, 693, 1266], endH: 430 + 48 + 72 };
+
+  const title = document.getElementById("title");
+  title.innerHTML = VERTICAL
+    ? 'Turn it into<br>a <span class="hl">skill</span>.'
+    : 'Turn it into a <span class="hl">skill</span>.';
+  title.style.top = L.headerTop + "px";
+
+  const tee = document.getElementById("tee");
+  const cards = [1, 2, 3].map(i => document.getElementById("card" + i));
+  cards.forEach((c, i) => { c.style.top = L.cardTops[i] + "px"; c.style.left = L.cardLefts[i] + "px"; });
+  const parts = cards.map(c => ({
+    ring: c.querySelector(".ring"),
+    bits: [c.querySelector(".num"), c.querySelector(".head"), c.querySelector(".line")],
+  }));
+  const end = document.getElementById("end");
+  end.style.top = (H - L.endH) / 2 + "px";
+  const logo = document.getElementById("logo");
+  const cta = document.getElementById("cta");
+
+  // ---- helpers ----
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const prog = (t, start, dur) => clamp((t - start) / dur);
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const outCubic = x => 1 - Math.pow(1 - x, 3);
+  const inOutCubic = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+  // Big-title geometry: tee-up + big title form one block centered on screen.
+  const titleH = L.titleFont * 1.1 * L.titleLines;
+  const blockH = L.teeH + L.gap + titleH * L.bigScale;
+  const blockTop = (H - blockH) / 2;
+  const bigTitleTop = blockTop + L.teeH + L.gap;
+  const teeAloneTop = (H - L.teeH) / 2;
+
+  // ---- timeline (seconds) ----
+  const T = {
+    teeIn: 0.15, titleIn: 1.4, toHeader: 3.4, teeOut: 3.3,
+    steps: [4.0, 6.6, 9.2], exit: 11.8, logoIn: 12.6, ctaIn: 13.3,
+  };
+
+  window.render = function (t) {
+    // Exit: everything except the end card drifts up and fades (11.8–12.6s).
+    const ex = inOutCubic(prog(t, T.exit, 0.8));
+
+    // Tee-up: rises in centered, slides up as the title arrives, fades out.
+    const teeIn = outCubic(prog(t, T.teeIn, 0.7));
+    const make = inOutCubic(prog(t, T.titleIn, 0.8));
+    const teeOut = inOutCubic(prog(t, T.teeOut, 0.5));
+    tee.style.top = lerp(teeAloneTop, blockTop, make) + "px";
+    tee.style.opacity = teeIn * (1 - teeOut);
+    tee.style.transform = `translateY(${(1 - teeIn) * 30 - teeOut * 40}px)`;
+
+    // Title: rises in big and centered, then eases up into the header.
+    const tIn = outCubic(prog(t, T.titleIn, 0.8));
+    const up = inOutCubic(prog(t, T.toHeader, 0.7));
+    const s = lerp(L.bigScale, 1, up);
+    const ty = lerp(bigTitleTop - L.headerTop, 0, up) + (1 - tIn) * 50 - ex * 60;
+    title.style.opacity = tIn * (1 - ex);
+    title.style.transform = `translateY(${ty}px) scale(${s})`;
+
+    // Steps: each card rises in, its number/headline/line follow; the active card gets an accent ring.
+    T.steps.forEach((st, i) => {
+      const c = cards[i];
+      const p = outCubic(prog(t, st, 0.7));
+      const exI = inOutCubic(prog(t, T.exit + i * 0.06, 0.7));
+      c.style.opacity = p * (1 - exI);
+      c.style.transform = `translateY(${(1 - p) * 70 - exI * 60}px)`;
+
+      parts[i].bits.forEach((el, k) => {
+        const q = outCubic(prog(t, st + 0.15 + k * 0.12, 0.6));
+        el.style.opacity = q;
+        el.style.transform = `translateY(${(1 - q) * 24}px)`;
+      });
+
+      const next = T.steps[i + 1] ?? T.exit;
+      const on = inOutCubic(prog(t, st + 0.3, 0.4)) * (1 - inOutCubic(prog(t, next, 0.4)));
+      parts[i].ring.style.opacity = on;
+    });
+
+    // End card: logo eases in, then the call to action.
+    const lg = outCubic(prog(t, T.logoIn, 0.9));
+    logo.style.opacity = lg;
+    logo.style.transform = `scale(${0.9 + 0.1 * lg})`;
+    const ct = outCubic(prog(t, T.ctaIn, 0.7));
+    cta.style.opacity = ct;
+    cta.style.transform = `translateY(${(1 - ct) * 24}px)`;
+  };
+
+  // Preview in a browser: skill-explainer.html?t=5 or ?variant=vertical&t=5
+  window.render(parseFloat(new URLSearchParams(location.search).get("t")) || 0);
+</script>
+</body>
+</html>
