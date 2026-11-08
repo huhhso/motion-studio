@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../brand.css">
+<style>
+  .stage { position: relative; width: 100%; height: 100%; display: grid; place-items: center; }
+  .title {
+    font-family: var(--font-display); font-weight: 700; font-size: 128px;
+    letter-spacing: -0.03em; display: flex; gap: 0.28em;
+  }
+  .word { display: inline-block; will-change: transform, opacity; }
+  .word.accent { color: var(--accent); }
+  .bar {
+    position: absolute; left: 50%; top: calc(50% + 110px); height: 10px; width: 520px;
+    margin-left: -260px; background: var(--accent); border-radius: 5px; transform-origin: left center;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="title" id="title"></div>
+  <div class="bar" id="bar"></div>
+</div>
+<script>
+  window.DURATION = 3;
+  window.SIZE = [1920, 1080];
+
+  // Helpers: pure functions of t, no timers.
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const progress = (t, start, dur) => clamp((t - start) / dur);
+  const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+  const easeInOutCubic = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+
+  const words = ["Hello", "from", "my", "studio"];
+  const title = document.getElementById("title");
+  const bar = document.getElementById("bar");
+  const els = words.map((w, i) => {
+    const s = document.createElement("span");
+    s.className = "word" + (i === words.length - 1 ? " accent" : "");
+    s.textContent = w;
+    title.appendChild(s);
+    return s;
+  });
+
+  window.render = function (t) {
+    // Exit: everything fades and lifts over the last 0.4s.
+    const out = easeInOutCubic(progress(t, 2.6, 0.4));
+
+    // Words rise in one after another.
+    els.forEach((el, i) => {
+      const p = easeOutCubic(progress(t, 0.15 + i * 0.14, 0.6));
+      el.style.opacity = p * (1 - out);
+      el.style.transform = `translateY(${(1 - p) * 60 - out * 30}px)`;
+    });
+
+    // Underline sweeps in after the last word.
+    const b = easeInOutCubic(progress(t, 0.9, 0.7));
+    bar.style.transform = `scaleX(${b})`;
+    bar.style.opacity = 1 - out;
+  };
+
+  // Preview in a normal browser: open hello.html?t=1.5 to see that frame.
+  window.render(parseFloat(new URLSearchParams(location.search).get("t")) || 0);
+</script>
+</body>
+</html>

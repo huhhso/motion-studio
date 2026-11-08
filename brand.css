@@ -1,0 +1,28 @@
+/* Brand tokens — edit these to restyle every video. */
+:root {
+  /* Colors */
+  --bg:        #0e0f13;  /* background */
+  --surface:   #1a1c23;  /* cards, panels */
+  --text:      #f4f1ea;  /* primary text */
+  --muted:     #8a8d98;  /* secondary text */
+  --accent:    #ff5a36;  /* primary accent */
+  --accent-2:  #ffc23d;  /* secondary accent */
+
+  /* Fonts (installed locally, so no network needed at render time) */
+  --font-display: "Inter Display", "Inter", system-ui, sans-serif;
+  --font-body:    "Inter", system-ui, sans-serif;
+  --font-mono:    "DejaVu Sans Mono", ui-monospace, monospace;
+}
+
+/* Base stage: the browser viewport is set to window.SIZE by render.mjs. */
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+*, *::before, *::after { box-sizing: border-box; }
