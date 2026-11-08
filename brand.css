@@ -10,14 +10,14 @@
 
 :root {
   /* Brand colors */
-  --bg:      #ffffff;  /* background — "white" */
-  --text:    #111111;  /* main text — "black", softened slightly */
-  --accent:  #ac285b;  /* accent */
-  --muted:   #efefef;  /* muted: light grey — fills, dividers, cards (too light for text on white) */
+  --bg:       #ffffff;  /* white — page background */
+  --text:     #000000;  /* black — text */
+  --accent:   #ac285b;  /* plum/pink — main accent */
+  --accent-2: #de6537;  /* bright orange — second accent */
+  --surface:  #efefef;  /* light gray — card and section backgrounds (not for text) */
 
-  /* Extra colors used by the hello video (not part of the core brand) */
-  --burnt-orange: #de6537;
-  --gold:         #f1bc45;
+  /* Extra color used only by the hello video's underline (from your mockup) */
+  --gold:     #f1bc45;
 
   /* Fonts */
   --font-display: "Poppins", system-ui, sans-serif;     /* headlines */

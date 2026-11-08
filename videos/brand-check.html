@@ -15,7 +15,7 @@
     line-height: 1.05; letter-spacing: -0.02em; margin-top: 12px;
   }
 
-  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-top: 56px; }
+  .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; margin-top: 56px; }
   .chip {
     height: 210px; border-radius: 20px;
     box-shadow: inset 0 0 0 2px rgba(17, 17, 17, 0.10);
@@ -24,7 +24,7 @@
   .chip-code { font-family: var(--font-body); font-size: 22px; margin-top: 4px; opacity: 0.6; }
   .chip-code b { font-weight: 600; opacity: 1; }
 
-  .divider { height: 2px; background: var(--muted); margin-top: 48px; transform-origin: left center; }
+  .divider { height: 2px; background: var(--surface); margin-top: 48px; transform-origin: left center; }
 
   .type { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 44px; }
   .specimen { display: flex; gap: 40px; align-items: center; }
@@ -85,7 +85,8 @@
     { name: "Background", token: "--bg" },
     { name: "Text",       token: "--text" },
     { name: "Accent",     token: "--accent" },
-    { name: "Muted",      token: "--muted" },
+    { name: "Accent 2",   token: "--accent-2" },
+    { name: "Surface",    token: "--surface" },
   ];
   const wrap = document.getElementById("swatches");
   const chips = colors.map((c, i) => {
@@ -98,7 +99,7 @@
         <div class="chip-code"><b>${hex}</b> &nbsp;${c.token}</div>
       </div>`;
     wrap.appendChild(el);
-    return { chip: el.querySelector(".chip"), label: el.querySelector(".label"), start: 0.75 + i * 0.16 };
+    return { chip: el.querySelector(".chip"), label: el.querySelector(".label"), start: 0.75 + i * 0.13 };
   });
 
   const risers = [...document.querySelectorAll("[data-in]")].map(el => ({ el, start: +el.dataset.in }));
@@ -122,7 +123,7 @@
       s.label.style.transform = `translateY(${(1 - q) * 20}px)`;
     }
 
-    // Divider (in the muted color) draws across.
+    // Divider (in the surface gray) draws across.
     divider.style.transform = `scaleX(${easeInOutCubic(progress(t, 1.6, 0.8))})`;
   };
 
