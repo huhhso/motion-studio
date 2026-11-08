@@ -1,19 +1,28 @@
-/* Brand tokens — edit these to restyle every video. */
-:root {
-  /* Colors */
-  --bg:        #ffffff;  /* background */
-  --surface:   #f6f1ec;  /* cards, panels */
-  --text:      #000000;  /* primary text */
-  --muted:     #fbb918;  /* secondary text */
-  --accent:    #9e345b;  /* primary accent */
-  --accent-2:  #e7903e;  /* secondary accent */
-  --burnt-orange: #de6537;  /* highlight words */
-  --gold:         #f1bc45;  /* underlines, rules */
+/* Brand — edit these to restyle every video. */
 
-  /* Fonts (installed locally, so no network needed at render time) */
-  --font-display: "Inter Display", "Inter", system-ui, sans-serif;
-  --font-body:    "Inter", system-ui, sans-serif;
-  --font-mono:    "DejaVu Sans Mono", ui-monospace, monospace;
+/* Fonts: bundled in ./fonts (free Google Fonts, OFL license), so renders work offline. */
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-Regular.ttf") format("truetype");  font-weight: 400; font-style: normal; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-Medium.ttf") format("truetype");   font-weight: 500; font-style: normal; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-SemiBold.ttf") format("truetype"); font-weight: 600; font-style: normal; }
+@font-face { font-family: "Poppins"; src: url("fonts/Poppins-Bold.ttf") format("truetype");     font-weight: 700; font-style: normal; }
+@font-face { font-family: "Open Sans"; src: url("fonts/OpenSans-Variable.ttf") format("truetype");        font-weight: 300 800; font-stretch: 75% 100%; font-style: normal; }
+@font-face { font-family: "Open Sans"; src: url("fonts/OpenSans-Italic-Variable.ttf") format("truetype"); font-weight: 300 800; font-stretch: 75% 100%; font-style: italic; }
+
+:root {
+  /* Brand colors */
+  --bg:      #ffffff;  /* background — "white" */
+  --text:    #111111;  /* main text — "black", softened slightly */
+  --accent:  #ac285b;  /* accent */
+  --muted:   #efefef;  /* muted: light grey — fills, dividers, cards (too light for text on white) */
+
+  /* Extra colors used by the hello video (not part of the core brand) */
+  --burnt-orange: #de6537;
+  --gold:         #f1bc45;
+
+  /* Fonts */
+  --font-display: "Poppins", system-ui, sans-serif;     /* headlines */
+  --font-body:    "Open Sans", system-ui, sans-serif;   /* body text */
+  --font-mono:    ui-monospace, "DejaVu Sans Mono", monospace;
 }
 
 /* Base stage: the browser viewport is set to window.SIZE by render.mjs. */

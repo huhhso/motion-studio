@@ -63,7 +63,16 @@ try {
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
 
   await page.goto(pathToFileURL(file).href, { waitUntil: "load" });
-  await page.evaluate(() => document.fonts.ready);
+
+  // Load every @font-face up front (fonts otherwise load lazily, on first use),
+  // so frame 0 already uses the right fonts. Stop if a font file is missing.
+  const badFonts = await page.evaluate(async () => {
+    const faces = [...document.fonts];
+    await Promise.allSettled(faces.map((f) => f.load()));
+    await document.fonts.ready;
+    return faces.filter((f) => f.status !== "loaded").map((f) => `${f.family} ${f.weight} ${f.style}`);
+  });
+  if (badFonts.length) throw new Error(`Font(s) failed to load:\n  ${badFonts.join("\n  ")}`);
 
   const meta = await page.evaluate(() => ({
     duration: window.DURATION,

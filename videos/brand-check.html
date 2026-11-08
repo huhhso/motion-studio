@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../brand.css">
+<style>
+  .page { position: absolute; inset: 0; padding: 0 120px; display: flex; flex-direction: column; justify-content: center; }
+
+  .eyebrow {
+    font-family: var(--font-body); font-weight: 700; font-size: 22px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent);
+  }
+  .headline {
+    font-family: var(--font-display); font-weight: 600; font-size: 84px;
+    line-height: 1.05; letter-spacing: -0.02em; margin-top: 12px;
+  }
+
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px; margin-top: 56px; }
+  .chip {
+    height: 210px; border-radius: 20px;
+    box-shadow: inset 0 0 0 2px rgba(17, 17, 17, 0.10);
+  }
+  .chip-name { font-family: var(--font-display); font-weight: 600; font-size: 30px; margin-top: 22px; }
+  .chip-code { font-family: var(--font-body); font-size: 22px; margin-top: 4px; opacity: 0.6; }
+  .chip-code b { font-weight: 600; opacity: 1; }
+
+  .divider { height: 2px; background: var(--muted); margin-top: 48px; transform-origin: left center; }
+
+  .type { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 44px; }
+  .specimen { display: flex; gap: 40px; align-items: center; }
+  .aa { font-size: 150px; line-height: 1; color: var(--accent); }
+  .aa.display { font-family: var(--font-display); font-weight: 600; }
+  .aa.body { font-family: var(--font-body); font-weight: 400; }
+  .font-name { font-family: var(--font-display); font-weight: 600; font-size: 36px; }
+  .font-role { font-family: var(--font-body); font-weight: 600; font-size: 20px; letter-spacing: 0.12em;
+               text-transform: uppercase; opacity: 0.55; margin-top: 2px; }
+  .sample { font-size: 24px; line-height: 1.45; margin-top: 12px; max-width: 520px; }
+  .sample.display { font-family: var(--font-display); font-weight: 500; }
+  .sample.body { font-family: var(--font-body); }
+
+  [data-in] { will-change: transform, opacity; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow" data-in="0.10">Brand check</div>
+  <div class="headline" data-in="0.22">Colors &amp; type</div>
+
+  <div class="swatches" id="swatches"></div>
+
+  <div class="divider" id="divider"></div>
+
+  <div class="type">
+    <div class="specimen" data-in="2.00">
+      <div class="aa display">Aa</div>
+      <div>
+        <div class="font-name">Poppins</div>
+        <div class="font-role">Headlines</div>
+        <div class="sample display">Bold ideas, clearly told.</div>
+      </div>
+    </div>
+    <div class="specimen" data-in="2.20">
+      <div class="aa body">Aa</div>
+      <div>
+        <div class="font-name" style="font-family: var(--font-body); font-weight: 600;">Open Sans</div>
+        <div class="font-role">Body</div>
+        <div class="sample body">The quick brown fox jumps over the lazy dog. 0123456789</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  window.DURATION = 5;
+  window.SIZE = [1920, 1080];
+
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const progress = (t, start, dur) => clamp((t - start) / dur);
+  const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+  const easeInOutCubic = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const easeOutBack = x => { const c = 1.4; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+
+  // Swatches: values come from brand.css, so labels always match the real colors.
+  const css = getComputedStyle(document.documentElement);
+  const colors = [
+    { name: "Background", token: "--bg" },
+    { name: "Text",       token: "--text" },
+    { name: "Accent",     token: "--accent" },
+    { name: "Muted",      token: "--muted" },
+  ];
+  const wrap = document.getElementById("swatches");
+  const chips = colors.map((c, i) => {
+    const hex = css.getPropertyValue(c.token).trim().toUpperCase();
+    const el = document.createElement("div");
+    el.innerHTML = `
+      <div class="chip" style="background: var(${c.token})"></div>
+      <div class="label">
+        <div class="chip-name">${c.name}</div>
+        <div class="chip-code"><b>${hex}</b> &nbsp;${c.token}</div>
+      </div>`;
+    wrap.appendChild(el);
+    return { chip: el.querySelector(".chip"), label: el.querySelector(".label"), start: 0.75 + i * 0.16 };
+  });
+
+  const risers = [...document.querySelectorAll("[data-in]")].map(el => ({ el, start: +el.dataset.in }));
+  const divider = document.getElementById("divider");
+
+  window.render = function (t) {
+    // Headline and font specimens rise in.
+    for (const { el, start } of risers) {
+      const p = easeOutCubic(progress(t, start, 0.7));
+      el.style.opacity = p;
+      el.style.transform = `translateY(${(1 - p) * 40}px)`;
+    }
+
+    // Swatches pop in one by one, labels follow.
+    for (const s of chips) {
+      const p = progress(t, s.start, 0.6);
+      s.chip.style.opacity = clamp(p * 3);
+      s.chip.style.transform = `scale(${0.8 + 0.2 * easeOutBack(p)})`;
+      const q = easeOutCubic(progress(t, s.start + 0.15, 0.6));
+      s.label.style.opacity = q;
+      s.label.style.transform = `translateY(${(1 - q) * 20}px)`;
+    }
+
+    // Divider (in the muted color) draws across.
+    divider.style.transform = `scaleX(${easeInOutCubic(progress(t, 1.6, 0.8))})`;
+  };
+
+  // Preview in a normal browser: open brand-check.html?t=2 to see that frame.
+  window.render(parseFloat(new URLSearchParams(location.search).get("t")) || 0);
+</script>
+</body>
+</html>

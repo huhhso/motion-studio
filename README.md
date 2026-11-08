@@ -12,6 +12,8 @@ Motion graphics videos written as code.
   No CSS animations, transitions or timers: all motion is computed from `t`,
   so every render is identical. `render.mjs` warns if it finds any.
 - `brand.css` — colors and fonts as CSS variables, plus base page styles.
+- `fonts/` — bundled brand fonts (Poppins, Open Sans; free Google Fonts under the OFL,
+  licenses included), loaded by `brand.css` so renders work offline.
 - `render.mjs` — renders a video with Playwright (Chromium) and ffmpeg.
 - `out/` — rendered MP4s (committed). Stills go to `out/stills/` (ignored by git).
 
@@ -27,3 +29,7 @@ To preview a single frame in a normal browser, open `videos/hello.html?t=1.5`.
 
 Requires Node 18+, ffmpeg on the PATH, and Playwright with Chromium
 (a local `npm i playwright` or a global install both work).
+`render.mjs` loads every font before the first frame and stops if a font file is missing.
+
+`videos/brand-check.html` shows every brand color and both fonts — render it after
+changing `brand.css` to check the result.
