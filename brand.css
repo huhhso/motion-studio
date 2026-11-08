@@ -16,8 +16,18 @@
   --accent-2: #de6537;  /* bright orange — second accent */
   --surface:  #efefef;  /* light gray — card and section backgrounds (not for text) */
 
-  /* Extra color used only by the hello video's underline (from your mockup) */
-  --gold:     #f1bc45;
+  /* Full palette — extra colors for reference. The five brand colors above
+     come first; these are available when a video needs more.
+     Palette order: orange (= accent-2), light orange, burnt orange, apricot,
+     gold, plum, sand, gray 500, gray 300, gray 100 (= surface), white, black. */
+  --light-orange:  #e7903d;
+  --burnt-orange:  #cf6936;
+  --apricot:       #ea9b43;
+  --gold:          #f1bc45;  /* hello video underline */
+  --plum:          #9e345b;
+  --sand:          #cfb4a5;
+  --gray-500:      #a5a5a5;
+  --gray-300:      #d2d2d2;
 
   /* Fonts */
   --font-display: "Poppins", system-ui, sans-serif;     /* headlines */
