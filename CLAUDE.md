@@ -23,6 +23,16 @@ See README.md for how the studio works.
 **Mascot**: `assets/mascot.png`, a white robot with Louie the black cat. It keeps its own colors.
 Its white background is blended away with `mix-blend-mode: multiply`.
 
+## Design style
+
+- Balanced, generous white space. Let elements breathe instead of filling the frame edge to edge.
+- Use size with intent: make the logo, artwork and key line big enough to carry the frame,
+  and balance their weight against each other rather than one tiny element and one huge one.
+- End card (reference: `videos/skill-explainer.html`):
+  - Vertical: logo on top, mascot below it, then the call to action large in plum (`--accent-2`),
+    Poppins Bold, centered over two lines.
+  - Landscape: logo and call to action stacked on the left, mascot on the right, all vertically balanced.
+
 ## Working rules
 
 - Every time a video is rendered: commit the MP4 in `out/` and push it, so it can be downloaded from GitHub.
