@@ -12,13 +12,13 @@
   /* Brand colors */
   --bg:       #ffffff;  /* white — page background */
   --text:     #000000;  /* black — text */
-  --accent:   #ac285b;  /* plum/pink — main accent */
-  --accent-2: #de6537;  /* bright orange — second accent */
+  --accent:   #de6537;  /* bright orange — primary accent */
+  --accent-2: #ac285b;  /* plum/pink — second accent */
   --surface:  #efefef;  /* light gray — card and section backgrounds (not for text) */
 
   /* Full palette — extra colors for reference. The five brand colors above
      come first; these are available when a video needs more.
-     Palette order: orange (= accent-2), light orange, burnt orange, apricot,
+     Palette order: orange (= accent), light orange, burnt orange, apricot,
      gold, plum, sand, gray 500, gray 300, gray 100 (= surface), white, black. */
   --light-orange:  #e7903d;
   --burnt-orange:  #cf6936;
