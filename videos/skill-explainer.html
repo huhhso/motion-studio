@@ -23,8 +23,9 @@
   .head { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
   .line { font-family: var(--font-body); line-height: 1.4; }
 
-  .end  { display: flex; flex-direction: column; align-items: center; }
-  .cta  { font-family: var(--font-display); font-weight: 600; white-space: nowrap; }
+  /* Brand rule: the logo sits above artwork, both higher on the page and on a higher layer. */
+  .logo { z-index: 20; transform-origin: 50% 50%; }
+  .cta  { z-index: 20; font-family: var(--font-display); font-weight: 600; white-space: nowrap; text-align: center; }
 
   /* ---- landscape 1920x1080 (YouTube) ---- */
   body.landscape .tee   { font-size: 48px; }
@@ -33,9 +34,8 @@
   body.landscape .num   { font-size: 160px; }
   body.landscape .head  { font-size: 44px; margin-top: 28px; min-height: 2.3em; }
   body.landscape .line  { font-size: 28px; margin-top: 12px; }
-  body.landscape .end   { left: 900px; width: 900px; }
   body.landscape .logo  { height: 380px; }
-  body.landscape .cta   { font-size: 50px; margin-top: 44px; }
+  body.landscape .cta   { font-size: 50px; }
 
   /* ---- vertical 1080x1920 (Reels / Shorts / TikTok): card content stacks ---- */
   body.vertical .tee    { font-size: 52px; }
@@ -44,9 +44,8 @@
   body.vertical .num    { font-size: 100px; }
   body.vertical .head   { font-size: 48px; margin-top: 14px; }
   body.vertical .line   { font-size: 31px; margin-top: 6px; }
-  body.vertical .end    { left: 0; width: 1080px; }
   body.vertical .logo   { width: 460px; }
-  body.vertical .cta    { font-size: 54px; margin-top: 48px; }
+  body.vertical .cta    { font-size: 54px; }
 </style>
 </head>
 <body>
@@ -65,10 +64,8 @@
     <div class="head">Reuse it anytime</div>
     <div class="line">Paste the next answer. Get the next post.</div></div>
 
-  <div class="abs end" id="end">
-    <img class="logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
-    <div class="cta" id="cta">Follow me for more AI shortcuts</div>
-  </div>
+  <img class="abs logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
+  <div class="abs cta" id="cta">Follow me for more AI shortcuts</div>
 
 <script>
   // ---- format: landscape by default; ?variant=vertical for 1080x1920 ----
@@ -82,18 +79,20 @@
   const L = VERTICAL ? {
     titleFont: 84, bigScale: 1.35, header: { x: 72, y: 250 },
     introTitleTop: 1170, centerIntroTitle: true, teeAloneY: 1150, teeGap: 26, teeH: 72,
-    mascot: { intro: [540, 640, 760], header: [880, 350, 320], end: [540, 560, 700] },
-    cardTops: [560, 890, 1220], cardLefts: [72, 72, 72], endTop: 950,
+    mascot: { intro: [540, 640, 760], header: [880, 350, 320], end: [540, 1010, 620] },
+    cardTops: [560, 890, 1220], cardLefts: [72, 72, 72],
+    logo: { cx: 540, top: 230 }, cta: { cx: 540, top: 1370 },
   } : {
     titleFont: 64, bigScale: 1.9, header: { x: 120, y: 92 },
     introTitleX: 140, centerIntroTitle: false, teeGap: 26, teeH: 66,
-    mascot: { intro: [1390, 540, 860], header: [1680, 175, 280], end: [560, 540, 720] },
-    cardTops: [340, 340, 340], cardLefts: [120, 693, 1266], endTop: null,
+    mascot: { intro: [1390, 540, 860], header: [1680, 175, 280], end: [1400, 650, 680] },
+    cardTops: [340, 340, 340], cardLefts: [120, 693, 1266],
+    logo: { cx: 570, top: 180 }, cta: { cx: 570, top: 620 },
   };
 
   const $ = id => document.getElementById(id);
   const tee = $("tee"), title = $("title"), swoosh = $("swoosh"), mascot = $("mascot");
-  const end = $("end"), logo = $("logo"), cta = $("cta");
+  const logo = $("logo"), cta = $("cta");
   const cards = [1, 2, 3].map(i => $("card" + i));
   cards.forEach((c, i) => { c.style.top = L.cardTops[i] + "px"; c.style.left = L.cardLefts[i] + "px"; });
   const parts = cards.map(c => ({
@@ -182,7 +181,10 @@
     });
 
     // ---- end card: logo eases in, then the call to action ----
-    end.style.top = (L.endTop ?? (H - end.offsetHeight) / 2) + "px";
+    logo.style.left = L.logo.cx - logo.offsetWidth / 2 + "px";
+    logo.style.top = L.logo.top + "px";
+    cta.style.left = L.cta.cx - cta.offsetWidth / 2 + "px";
+    cta.style.top = L.cta.top + "px";
     const lg = outCubic(prog(t, T.logoIn, 0.9));
     logo.style.opacity = lg;
     logo.style.transform = `scale(${0.9 + 0.1 * lg})`;
