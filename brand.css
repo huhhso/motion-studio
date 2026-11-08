@@ -1,12 +1,12 @@
 /* Brand tokens — edit these to restyle every video. */
 :root {
   /* Colors */
-  --bg:        #0e0f13;  /* background */
-  --surface:   #1a1c23;  /* cards, panels */
-  --text:      #f4f1ea;  /* primary text */
-  --muted:     #8a8d98;  /* secondary text */
-  --accent:    #ff5a36;  /* primary accent */
-  --accent-2:  #ffc23d;  /* secondary accent */
+  --bg:        #e7903e;  /* background */
+  --surface:   #ffffff;  /* cards, panels */
+  --text:      #000000;  /* primary text */
+  --muted:     #9e345b;  /* secondary text */
+  --accent:    #cf6936;  /* primary accent */
+  --accent-2:  #f1bc45;  /* secondary accent */
 
   /* Fonts (installed locally, so no network needed at render time) */
   --font-display: "Inter Display", "Inter", system-ui, sans-serif;
