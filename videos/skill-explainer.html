@@ -30,11 +30,12 @@
 
   /* ---- landscape 1920x1080 (YouTube) ---- */
   body.landscape .tee   { font-size: 48px; }
-  body.landscape .title { font-size: 64px; }
-  body.landscape .card  { top: 340px; width: 533px; height: 500px; padding: 52px 52px; }
-  body.landscape .num   { font-size: 160px; }
-  body.landscape .head  { font-size: 44px; margin-top: 28px; min-height: 2.3em; }
-  body.landscape .line  { font-size: 28px; margin-top: 12px; }
+  body.landscape .title { font-size: 72px; }
+  body.landscape .card  { width: 1000px; height: 196px; padding: 0 48px;
+                          display: grid; grid-template-columns: 130px 1fr; column-gap: 32px; align-items: center; }
+  body.landscape .num   { font-size: 124px; justify-self: center; transform-origin: center; }
+  body.landscape .head  { font-size: 50px; }
+  body.landscape .line  { font-size: 32px; margin-top: 8px; }
   body.landscape .logo  { width: 420px; }
   body.landscape .cta   { font-size: 66px; }
 
@@ -42,9 +43,9 @@
   body.vertical .tee    { font-size: 52px; }
   body.vertical .title  { font-size: 84px; }
   body.vertical .card   { left: 72px; width: 936px; height: 300px; padding: 34px 48px; }
-  body.vertical .num    { font-size: 100px; }
-  body.vertical .head   { font-size: 48px; margin-top: 14px; }
-  body.vertical .line   { font-size: 31px; margin-top: 6px; }
+  body.vertical .num    { font-size: 96px; }
+  body.vertical .head   { font-size: 54px; margin-top: 14px; }
+  body.vertical .line   { font-size: 34px; margin-top: 6px; }
   body.vertical .logo   { width: 480px; }
   body.vertical .cta    { font-size: 86px; }
 </style>
@@ -56,14 +57,14 @@
   <div class="abs title" id="title">Turn it into<br>a <span class="hl">skill<span class="swoosh" id="swoosh"></span></span>.</div>
 
   <div class="abs card" id="card1"><div class="ring"></div><div class="num">1</div>
-    <div class="head">Capture the moment</div>
-    <div class="line">Like turning a client answer into a post.</div></div>
+    <div class="txt"><div class="head">Capture the moment</div>
+    <div class="line">Like turning a client answer into a post.</div></div></div>
   <div class="abs card" id="card2"><div class="ring"></div><div class="num">2</div>
-    <div class="head">Say “make this a skill”</div>
-    <div class="line">It saves your steps, style and rules.</div></div>
+    <div class="txt"><div class="head">Say “make this a skill”</div>
+    <div class="line">It saves your steps, style and rules.</div></div></div>
   <div class="abs card" id="card3"><div class="ring"></div><div class="num">3</div>
-    <div class="head">Reuse it anytime</div>
-    <div class="line">Paste the next answer. Get the next post.</div></div>
+    <div class="txt"><div class="head">Reuse it anytime</div>
+    <div class="line">Paste the next answer. Get the next post.</div></div></div>
 
   <img class="abs logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
   <div class="abs cta" id="cta">Follow me for more<br>AI shortcuts</div>
@@ -79,15 +80,16 @@
   // ---- layout (px). Mascot states are [centerX, centerY, boxSize]. ----
   const L = VERTICAL ? {
     titleFont: 84, bigScale: 1.35, header: { x: 72, y: 250 },
-    introTitleTop: 1170, centerIntroTitle: true, teeAloneY: 1150, teeGap: 26, teeH: 72,
-    mascot: { intro: [540, 640, 760], header: [880, 350, 320], end: [540, 1046, 690] },
+    introCX: 540, introTitleTop: 1170, teeAloneY: 1150, teeGap: 26, teeH: 72,
+    mascot: { intro: [540, 640, 780], header: [860, 360, 360], end: [540, 1046, 690] },
     cardTops: [560, 890, 1220], cardLefts: [72, 72, 72],
     logo: { cx: 540, top: 210 }, cta: { cx: 540, top: 1440 },
   } : {
-    titleFont: 64, bigScale: 1.9, header: { x: 120, y: 92 },
-    introTitleX: 140, centerIntroTitle: false, teeGap: 26, teeH: 66,
-    mascot: { intro: [1390, 540, 860], header: [1680, 175, 280], end: [1406, 653, 690] },
-    cardTops: [340, 340, 340], cardLefts: [120, 693, 1266],
+    titleFont: 72, bigScale: 1.75, header: { x: 120, y: 90 },
+    introCX: 570, teeGap: 26, teeH: 66,
+    // Text left, mascot big on the right in every scene (same balance as the end card).
+    mascot: { intro: [1406, 560, 820], header: [1500, 610, 720], end: [1406, 653, 690] },
+    cardTops: [300, 518, 736], cardLefts: [120, 120, 120],
     logo: { cx: 570, top: 172 }, cta: { cx: 575, top: 660 },
   };
 
@@ -120,9 +122,8 @@
     const bigW = tw * L.bigScale, bigH = th * L.bigScale;
 
     // Intro positions for the title block (tee-up sits just above the big title).
-    let introX, introY;
-    if (L.centerIntroTitle) { introX = (W - bigW) / 2; introY = L.introTitleTop; }
-    else { introX = L.introTitleX; introY = (H - (L.teeH + L.teeGap + bigH)) / 2 + L.teeH + L.teeGap; }
+    const introX = L.introCX - bigW / 2;
+    const introY = L.introTitleTop ?? (H - (L.teeH + L.teeGap + bigH)) / 2 + L.teeH + L.teeGap;
 
     const ex = inOutCubic(prog(t, T.exit, 0.8));            // exit of title + cards
     const up = inOutCubic(prog(t, T.toHeader, 0.7));         // title -> header
@@ -144,8 +145,8 @@
     const teeIn = outCubic(prog(t, T.teeIn, 0.7));
     const make = inOutCubic(prog(t, T.titleIn, 0.8));
     const teeOut = inOutCubic(prog(t, T.teeOut, 0.5));
-    const teeX = L.centerIntroTitle ? (W - teeW) / 2 : introX;
-    const teeAloneY = L.centerIntroTitle ? L.teeAloneY : (H - L.teeH) / 2;
+    const teeX = L.introCX - teeW / 2;
+    const teeAloneY = L.teeAloneY ?? (H - L.teeH) / 2;
     tee.style.left = teeX + "px";
     tee.style.top = lerp(teeAloneY, introY - L.teeH - L.teeGap, make) + "px";
     tee.style.opacity = teeIn * (1 - teeOut);

@@ -15,6 +15,8 @@ Motion graphics videos written as code.
 - `fonts/` — bundled brand fonts (Poppins, Open Sans; free Google Fonts under the OFL,
   licenses included), loaded by `brand.css` so renders work offline.
 - `render.mjs` — renders a video with Playwright (Chromium) and ffmpeg.
+- `templates/` — reusable video briefs with [brackets] for the parts that change.
+- `assets/` — logo and artwork.
 - `out/` — rendered MP4s (committed). Stills go to `out/stills/` (ignored by git).
 
 ## Rendering
@@ -23,6 +25,7 @@ Motion graphics videos written as code.
 node render.mjs hello              # -> out/hello.mp4 at 30 fps
 node render.mjs hello --stills 3   # -> out/stills/hello-1..3.png (first, middle, last frame)
 node render.mjs hello --fps 60     # optional frame-rate override
+node render.mjs skill-explainer --variant vertical   # -> out/skill-explainer-vertical.mp4
 ```
 
 To preview a single frame in a normal browser, open `videos/hello.html?t=1.5`.
