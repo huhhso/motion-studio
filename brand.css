@@ -7,6 +7,8 @@
   --muted:     #fbb918;  /* secondary text */
   --accent:    #9e345b;  /* primary accent */
   --accent-2:  #e7903e;  /* secondary accent */
+  --burnt-orange: #de6537;  /* highlight words */
+  --gold:         #f1bc45;  /* underlines, rules */
 
   /* Fonts (installed locally, so no network needed at render time) */
   --font-display: "Inter Display", "Inter", system-ui, sans-serif;
