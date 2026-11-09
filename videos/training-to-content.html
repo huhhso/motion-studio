@@ -1,0 +1,226 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../brand.css">
+<style>
+  .abs { position: absolute; }
+
+  /* Brand rule: the logo sits above artwork, both higher on the page and on a higher layer. */
+  .logo { left: 0; top: 0; width: 210px; z-index: 20; transform-origin: 50% 50%; }
+
+  .panel { left: 60px; top: 270px; width: 960px; height: 1470px; border-radius: 56px; background: var(--bg);
+           box-shadow: 0 0 0 3px var(--surface), 0 40px 90px rgba(0, 0, 0, 0.10); overflow: hidden;
+           transform-origin: 50% 40%; }
+
+  .thread { left: 44px; right: 44px; top: 48px; display: flex; flex-direction: column; gap: 40px; }
+  .row    { display: flex; gap: 22px; align-items: flex-start; }
+  .row.me { justify-content: flex-end; }
+
+  .bubble { max-width: 780px; padding: 26px 32px; border-radius: 40px 40px 12px 40px;
+            font-family: var(--font-body); font-size: 39px; line-height: 1.4; }
+  .bubble.old { background: var(--surface); color: var(--text); }
+  .bubble.new { background: var(--accent); color: #fff; font-size: 44px; font-weight: 600;
+                transform-origin: 100% 100%; }
+
+  /* Robot head cropped from the mascot artwork; white box blends away. */
+  .avatar { width: 88px; height: 88px; flex: 0 0 88px; border-radius: 50%; background-color: var(--bg);
+            background-image: url(../assets/mascot.png); background-repeat: no-repeat;
+            background-size: 210px 210px; background-position: -62px -20px; mix-blend-mode: multiply; }
+
+  .ai     { font-family: var(--font-body); font-size: 38px; line-height: 1.4; color: var(--text); padding-top: 14px; }
+  .ai ol  { margin: 14px 0 0; padding-left: 46px; }
+  .ai li  { margin-top: 8px; }
+  .ai b   { font-weight: 700; }
+
+  .answer { position: relative; flex: 1; min-height: 88px; }
+  .dots   { left: 0; top: 26px; display: flex; gap: 14px; }
+  .dot    { width: 20px; height: 20px; border-radius: 50%; background: var(--accent); }
+
+  .skill  { display: flex; align-items: center; gap: 34px; padding: 56px 52px; border-radius: 36px;
+            background: var(--surface); transform-origin: 0 50%; }
+  .skill .name { font-family: var(--font-display); font-weight: 700; font-size: 80px; line-height: 1.05;
+                 letter-spacing: -0.02em; color: var(--text); }
+  .skill svg { flex: 0 0 auto; }
+
+  .input  { left: 36px; right: 36px; bottom: 36px; display: flex; align-items: flex-end; gap: 22px;
+            padding: 22px 22px 22px 40px; border-radius: 48px; background: var(--surface); }
+  .field  { flex: 1; min-height: 100px; display: flex; align-items: center; padding: 6px 0;
+            font-family: var(--font-body); font-size: 46px; line-height: 1.35; color: var(--text); }
+  .field .hl { color: var(--accent); font-weight: 600; }
+  .caret  { display: inline-block; width: 5px; height: 54px; margin-left: 4px; vertical-align: -10px;
+            background: var(--accent); }
+  .send   { width: 100px; height: 100px; flex: 0 0 100px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; }
+
+  .cursor { left: 0; top: 0; z-index: 30; transform-origin: 10px 6px; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.25)); }
+  .ring   { left: 0; top: 0; width: 150px; height: 150px; border-radius: 50%; border: 5px solid var(--accent); z-index: 29; }
+</style>
+</head>
+<body>
+  <img class="abs logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
+
+  <div class="abs panel" id="panel">
+    <div class="abs thread" id="thread">
+      <!-- Her conversation from the bakery clip -->
+      <div class="row me"><div class="bubble old">I just taught a student how to save lumpy pastry cream. Give me 3 ways to turn this into social media content</div></div>
+      <div class="row">
+        <div class="avatar"></div>
+        <div class="ai">Here are 3 social media content ideas from this teachable moment:
+          <ol>
+            <li><b>Instagram Reel:</b> “Lumpy pastry cream? Don’t toss it.”</li>
+            <li><b>Carousel post:</b> “3 quick fixes before you start over.”</li>
+            <li><b>Story post:</b> “POV: you saved dessert with a pro tip.”</li>
+          </ol>
+        </div>
+      </div>
+      <!-- The new prompt, sent -->
+      <div class="row me"><div class="bubble new" id="sent">Create a skill from this workflow call it Training to Content</div></div>
+      <!-- The reply: thinking, then the skill -->
+      <div class="row" id="reply">
+        <div class="avatar" id="replyAvatar"></div>
+        <div class="answer">
+          <div class="abs dots" id="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="skill" id="skill">
+            <svg width="128" height="128" viewBox="0 0 96 96" fill="none">
+              <circle id="checkRing" cx="48" cy="48" r="42" stroke="#ac285b" stroke-width="7"
+                      stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 48 48)"/>
+              <path id="checkMark" d="M29 49 L43 63 L68 35" stroke="#ac285b" stroke-width="8"
+                    stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="60" stroke-dashoffset="60"/>
+            </svg>
+            <div class="name">Training to Content</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="abs input" id="input">
+      <div class="field"><span id="typed"></span></div>
+      <div class="send" id="send">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none">
+          <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="abs ring" id="ring"></div>
+  <svg class="abs cursor" id="cursor" width="64" height="64" viewBox="0 0 24 24">
+    <path d="M4 2.5l15 8.6-6.6 1.7L9.2 19z" fill="#000" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/>
+  </svg>
+
+<script>
+  window.DURATION = 10;
+  window.SIZE = [1080, 1920];
+  document.body.className = "vertical";
+
+  const PROMPT = "Create a skill from this workflow call it Training to Content";
+  const HL = PROMPT.indexOf("Training to Content");
+
+  const $ = id => document.getElementById(id);
+  const logo = $("logo"), panel = $("panel"), thread = $("thread"), input = $("input"), typed = $("typed");
+  const send = $("send"), sent = $("sent"), reply = $("reply"), replyAvatar = $("replyAvatar");
+  const dots = [...$("dots").children], skill = $("skill"), checkRing = $("checkRing"), checkMark = $("checkMark");
+  const cursor = $("cursor"), ring = $("ring");
+
+  // ---- helpers ----
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const prog = (t, start, dur) => clamp((t - start) / dur);
+  const lerp = (a, b, p) => a + (b - a) * p;
+  const outCubic = x => 1 - Math.pow(1 - x, 3);
+  const inOutCubic = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const outBack = x => { const c = 1.6; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+
+  // ---- timeline (seconds) ----
+  const T = { panelIn: 0, logoIn: 0.3, typeStart: 1.3, typeEnd: 4.9, cursorIn: 4.95, click: 5.75,
+              sent: 5.85, think: 6.55, skill: 7.6, check: 8.15 };
+
+  logo.style.left = 540 - 105 + "px";
+  logo.style.top = "40px";
+
+  // Measured once (fonts are loaded before the first frame).
+  let M = null;
+  function measure() {
+    const panelH = panel.offsetHeight;
+    const inputH = input.offsetHeight;                     // empty input, one line tall
+    const view = panelH - inputH - 36 - 48 - 40;           // visible thread height
+    const bottomOf = el => el.offsetTop + el.offsetHeight;
+    return {
+      scrollSent: Math.max(0, bottomOf(sent.parentElement) + 140 - view),
+      scrollSkill: Math.max(0, bottomOf(reply) - view),
+      sendX: 60 + panel.offsetWidth - 36 - 22 - 50,
+      sendY: 270 + panelH - 36 - 22 - 50,
+    };
+  }
+
+  window.render = function (t) {
+    // ---- input text (laid out before measuring so the empty state is measured first) ----
+    const n = Math.round(lerp(0, PROMPT.length, prog(t, T.typeStart, T.typeEnd - T.typeStart)));
+    const isSent = t >= T.sent;
+    typed.innerHTML = ""; M = measure();   // re-measured every frame: fonts may load after the first call
+    const typing = t >= T.typeStart - 0.4 && !isSent;
+    const blinkOn = (t > T.typeStart && t < T.typeEnd) || Math.floor(t * 2.2) % 2 === 0;
+    let html = "";
+    if (!isSent) {
+      const shown = PROMPT.slice(0, n);
+      html = n > HL ? esc(shown.slice(0, HL)) + `<span class="hl">${esc(shown.slice(HL))}</span>` : esc(shown);
+      if (typing) html += `<span class="caret" style="opacity:${blinkOn ? 1 : 0}"></span>`;
+    }
+    typed.innerHTML = html;
+
+    // ---- panel + logo ----
+    const pIn = outCubic(prog(t, T.panelIn, 0.8));
+    panel.style.opacity = clamp(pIn * 1.6);
+    panel.style.transform = `translateY(${(1 - pIn) * 60}px) scale(${lerp(1.1, 1, pIn)})`;
+    const lg = outCubic(prog(t, T.logoIn, 0.8));
+    logo.style.opacity = lg;
+    logo.style.transform = `translateY(${(1 - lg) * -20}px) scale(${0.9 + 0.1 * lg})`;
+
+    // ---- send button: gray until there is text, orange press on click ----
+    const press = t < T.click - 0.06 ? 1 : lerp(0.84, 1, outCubic(prog(t, T.click, 0.25)));
+    send.style.background = n > 0 && !isSent ? "var(--accent)" : "var(--gray-300)";
+    send.style.transform = `scale(${t >= T.click - 0.06 ? press : 1})`;
+
+    // ---- cursor glides in on an arc, taps send ----
+    const mv = inOutCubic(prog(t, T.cursorIn, T.click - 0.1 - T.cursorIn));
+    const cFade = clamp(prog(t, T.cursorIn, 0.2)) * (1 - prog(t, T.click + 0.45, 0.3));
+    const cx = lerp(700, M.sendX, mv), cy = lerp(1380, M.sendY, mv) - Math.sin(mv * Math.PI) * 140;
+    const tap = t >= T.click - 0.06 && t < T.click + 0.3 ? lerp(0.8, 1, outCubic(prog(t, T.click, 0.3))) : 1;
+    cursor.style.opacity = cFade;
+    cursor.style.transform = `translate(${cx - 10}px, ${cy - 6}px) scale(${tap})`;
+    const rg = prog(t, T.click, 0.55);
+    ring.style.opacity = t >= T.click ? 1 - rg : 0;
+    ring.style.transform = `translate(${M.sendX - 75}px, ${M.sendY - 75}px) scale(${0.5 + 0.8 * outCubic(rg)})`;
+
+    // ---- sent bubble lifts out of the input into the thread ----
+    const sb = outCubic(prog(t, T.sent, 0.7));
+    sent.style.opacity = isSent ? clamp(sb * 2) : 0;
+    sent.style.transform = `translateY(${(1 - sb) * 420}px) scale(${lerp(0.85, 1, sb)})`;
+
+    // ---- thread scrolls up to make room ----
+    const s1 = inOutCubic(prog(t, T.sent, 0.7)), s2 = inOutCubic(prog(t, T.skill - 0.1, 0.7));
+    thread.style.transform = `translateY(${-lerp(lerp(0, M.scrollSent, s1), M.scrollSkill, s2)}px)`;
+
+    // ---- reply: avatar + thinking dots, then the skill card ----
+    const rIn = outCubic(prog(t, T.think, 0.4));
+    replyAvatar.style.opacity = rIn;
+    replyAvatar.style.transform = `scale(${0.6 + 0.4 * outBack(prog(t, T.think, 0.5))})`;
+    const dotsOn = rIn * (1 - prog(t, T.skill - 0.15, 0.2));
+    dots.forEach((d, i) => {
+      const b = Math.max(0, Math.sin((t - T.think) * 7 - i * 0.9));
+      d.style.opacity = dotsOn * (0.35 + 0.65 * b);
+      d.style.transform = `translateY(${-b * 14}px)`;
+    });
+    const sk = outCubic(prog(t, T.skill, 0.7));
+    skill.style.opacity = sk;
+    skill.style.transform = `translateY(${(1 - sk) * 40}px) scale(${lerp(0.94, 1, sk)})`;
+    checkRing.setAttribute("stroke-dashoffset", 264 * (1 - inOutCubic(prog(t, T.check, 0.55))));
+    checkMark.setAttribute("stroke-dashoffset", 60 * (1 - outCubic(prog(t, T.check + 0.4, 0.4))));
+  };
+
+  // Preview in a browser: training-to-content.html?t=5
+  window.render(parseFloat(new URLSearchParams(location.search).get("t")) || 0);
+</script>
+</body>
+</html>
