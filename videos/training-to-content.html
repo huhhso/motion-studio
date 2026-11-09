@@ -7,9 +7,9 @@
   .abs { position: absolute; }
 
   /* Brand rule: the logo sits above artwork, both higher on the page and on a higher layer. */
-  .logo { left: 0; top: 0; width: 210px; z-index: 20; transform-origin: 50% 50%; }
+  .logo { left: 0; top: 0; width: 330px; mix-blend-mode: multiply; z-index: 20; transform-origin: 50% 50%; }
 
-  .panel { left: 60px; top: 270px; width: 960px; height: 1470px; border-radius: 56px; background: var(--bg);
+  .panel { left: 60px; top: 330px; width: 960px; height: 1420px; border-radius: 56px; background: var(--bg);
            box-shadow: 0 0 0 3px var(--surface), 0 40px 90px rgba(0, 0, 0, 0.10); overflow: hidden;
            transform-origin: 50% 40%; }
 
@@ -23,10 +23,9 @@
   .bubble.new { background: var(--accent); color: #fff; font-size: 44px; font-weight: 600;
                 transform-origin: 100% 100%; }
 
-  /* Robot head cropped from the mascot artwork; white box blends away. */
-  .avatar { width: 88px; height: 88px; flex: 0 0 88px; border-radius: 50%; background-color: var(--bg);
-            background-image: url(../assets/mascot.png); background-repeat: no-repeat;
-            background-size: 210px 210px; background-position: -62px -20px; mix-blend-mode: multiply; }
+  /* The bakery's cupcake icon as the AI avatar; its white box blends away. */
+  .avatar { width: 88px; height: 100px; flex: 0 0 88px; background-image: url(../assets/clients/automagically/cupcake.png);
+            background-repeat: no-repeat; background-size: contain; background-position: center; mix-blend-mode: multiply; }
 
   .ai     { font-family: var(--font-body); font-size: 38px; line-height: 1.4; color: var(--text); padding-top: 14px; }
   .ai ol  { margin: 14px 0 0; padding-left: 46px; }
@@ -58,7 +57,8 @@
 </style>
 </head>
 <body>
-  <img class="abs logo" id="logo" src="../assets/w-creative-logo.png" alt="W Creative">
+  <!-- Case study: the client's logo (Automagically Delicious bakery), not W Creative's. -->
+  <img class="abs logo" id="logo" src="../assets/clients/automagically/logo.png" alt="Automagically Delicious">
 
   <div class="abs panel" id="panel">
     <div class="abs thread" id="thread">
@@ -136,8 +136,8 @@
   const T = { panelIn: 0, logoIn: 0.3, typeStart: 1.3, typeEnd: 4.9, cursorIn: 4.95, click: 5.75,
               sent: 5.85, think: 6.55, skill: 7.6, check: 8.15 };
 
-  logo.style.left = 540 - 105 + "px";
-  logo.style.top = "40px";
+  logo.style.left = 540 - 165 + "px";
+  logo.style.top = "48px";
 
   // Measured once (fonts are loaded before the first frame).
   let M = null;
@@ -150,7 +150,7 @@
       scrollSent: Math.max(0, bottomOf(sent.parentElement) + 140 - view),
       scrollSkill: Math.max(0, bottomOf(reply) - view),
       sendX: 60 + panel.offsetWidth - 36 - 22 - 50,
-      sendY: 270 + panelH - 36 - 22 - 50,
+      sendY: 330 + panelH - 36 - 22 - 50,
     };
   }
 
