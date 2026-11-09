@@ -43,22 +43,34 @@ zin="clip((t-($LA-0.65))/0.65,0,1)"    # push in over the last 0.65s of A
 zout="clip(t/0.7,0,1)"                  # pull out over the first 0.7s of C
 scaleZ() { echo "scale=w='trunc(1080*(1+$ZOOM*$1)/2)*2':h='trunc(1920*(1+$ZOOM*$1)/2)*2':eval=frame:flags=bicubic"; }
 
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+ENC=(-c:v libx264 -preset medium -crf 16 -pix_fmt yuv420p)
+
+# A: bakery up to the split, pushing into the iPad screen at the end.
+ffmpeg -y -loglevel error -t "$LA" -i "$BAKERY" -vf "fps=30,scale=1080:1920:flags=lanczos,setsar=1,
+  $(scaleZ "($zin)*($zin)*(3-2*$zin)"),$crop" "${ENC[@]}" -c:a aac -b:a 192k "$TMP/a.mp4"
+# C: bakery from the split, pulling back out of the screen.
+ffmpeg -y -loglevel error -ss "$SPLIT" -i "$BAKERY" -vf "fps=30,scale=1080:1920:flags=lanczos,setsar=1,
+  $(scaleZ "(1-($zout)*($zout)*(3-2*$zout))"),$crop" "${ENC[@]}" -c:a aac -b:a 192k "$TMP/c.mp4"
+LC=$(dur "$TMP/c.mp4")
+OFF3=$(echo "$OFF2 + $LC - $X3" | bc -l)
+TOTAL=$(echo "$OFF3 + $LD" | bc -l)
+
+# Join A, B, C, D with crossfades. Bakery audio sits under A and C only.
 ffmpeg -y -loglevel error \
-  -i "$BAKERY" -i "$MOTION" -i "$EXPLAINER" \
+  -i "$TMP/a.mp4" -i "$MOTION" -i "$TMP/c.mp4" -i "$EXPLAINER" \
   -filter_complex "
-    [0:v]trim=0:$LA,setpts=PTS-STARTPTS,fps=30,scale=1080:1920:flags=lanczos,setsar=1,
-         $(scaleZ "($zin)*($zin)*(3-2*$zin)"),$crop,format=yuv420p[a];
-    [0:v]trim=start=$SPLIT,setpts=PTS-STARTPTS,fps=30,scale=1080:1920:flags=lanczos,setsar=1,
-         $(scaleZ "(1-($zout)*($zout)*(3-2*$zout))"),$crop,format=yuv420p[c];
-    [1:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p[b];
-    [2:v]fps=30,scale=1080:1920,setsar=1,format=yuv420p[d];
+    [0:v]settb=AVTB,fps=30,format=yuv420p[a];
+    [1:v]settb=AVTB,fps=30,scale=1080:1920,setsar=1,format=yuv420p[b];
+    [2:v]settb=AVTB,fps=30,format=yuv420p[c];
+    [3:v]settb=AVTB,fps=30,scale=1080:1920,setsar=1,format=yuv420p[d];
     [a][b]xfade=transition=fade:duration=$X1:offset=$OFF1[ab];
     [ab][c]xfade=transition=fade:duration=$X2:offset=$OFF2[abc];
     [abc][d]xfade=transition=fade:duration=$X3:offset=$OFF3[v];
-    [0:a]atrim=0:$LA,asetpts=PTS-STARTPTS,afade=t=out:st=$OFF1:d=$X1[aa];
-    [0:a]atrim=start=$SPLIT,asetpts=PTS-STARTPTS,afade=t=in:d=$X2,afade=t=out:st=$(echo "$LC - $X3" | bc -l):d=$X3,
-         adelay=delays=$(echo "($OFF2 * 1000)/1" | bc):all=1[ac];
-    [aa][ac]amix=inputs=2:normalize=0:duration=longest,apad,atrim=0:$TOTAL[aout]
+    [0:a]afade=t=out:st=$OFF1:d=$X1[aa];
+    [2:a]afade=t=in:d=$X2,afade=t=out:st=$(echo "$LC - $X3" | bc -l):d=$X3,adelay=delays=$(echo "($OFF2 * 1000)/1" | bc):all=1[ac];
+    [aa][ac]amix=inputs=2:normalize=0:duration=longest[am];
+    [am]apad=whole_dur=$TOTAL[aout]
   " \
   -map "[v]" -map "[aout]" -t "$TOTAL" \
   -c:v libx264 -preset slow -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k -movflags +faststart \
